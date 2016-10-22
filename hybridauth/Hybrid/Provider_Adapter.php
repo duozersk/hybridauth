@@ -153,11 +153,15 @@ class Hybrid_Provider_Adapter {
 		# for default HybridAuth endpoint url hauth_login_start_url
 		# 	auth.start  required  the IDp ID
 		# 	auth.time   optional  login request timestamp
-		$this->params["login_start"] = $HYBRID_AUTH_URL_BASE . ( strpos($HYBRID_AUTH_URL_BASE, '?') ? '&' : '?' ) . "hauth.start={$this->id}&hauth.time={$this->params["hauth_time"]}";
+		if (!isset($this->params["login_start"]) ) {
+			$this->params["login_start"] = $HYBRID_AUTH_URL_BASE . ( strpos($HYBRID_AUTH_URL_BASE, '?') ? '&' : '?' ) . "hauth.start={$this->id}&hauth.time={$this->params["hauth_time"]}";
+		}
 
 		# for default HybridAuth endpoint url hauth_login_done_url
 		# 	auth.done   required  the IDp ID
-		$this->params["login_done"] = $HYBRID_AUTH_URL_BASE . ( strpos($HYBRID_AUTH_URL_BASE, '?') ? '&' : '?' ) . "hauth.done={$this->id}";
+		if (!isset($this->params["login_done"]) ) {
+			$this->params["login_done"] = $HYBRID_AUTH_URL_BASE . ( strpos($HYBRID_AUTH_URL_BASE, '?') ? '&' : '?' ) . "hauth.done={$this->id}";
+		}
 
 		if (isset($this->params["hauth_return_to"])) {
 			Hybrid_Auth::storage()->set("hauth_session.{$this->id}.hauth_return_to", $this->params["hauth_return_to"]);
@@ -173,7 +177,12 @@ class Hybrid_Provider_Adapter {
 		// move on
 		Hybrid_Logger::debug("Hybrid_Provider_Adapter::login( {$this->id} ), redirect the user to login_start URL.");
 
-		Hybrid_Auth::redirect($this->params["login_start"]);
+		// redirect
+		if (empty($this->params["redirect_mode"])) {
+			Hybrid_Auth::redirect($this->params["login_start"]);	
+		} else {
+			Hybrid_Auth::redirect($this->params["login_start"],$this->params["redirect_mode"]);
+		}
 	}
 
 	/**
